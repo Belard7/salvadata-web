@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SalvaData | Respaldo automático y cifrado para tu negocio</title>
+  <meta name="description" content="SalvaData respalda automáticamente el inventario, las facturas y la contabilidad de tu negocio en la nube, cifrados desde tu equipo. Prueba gratis 14 días.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Sprite de iconos (se reutilizan con <use href="#...">) -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+    <symbol id="logo" viewBox="0 0 32 32"><path d="M16 2.5 4.5 7v8.2c0 7.2 4.9 12.4 11.5 14.3 6.6-1.9 11.5-7.1 11.5-14.3V7L16 2.5Z" fill="currentColor"/><path d="m10.5 16 4 4 7-8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v5.5c0 4.7 3.2 8.1 7.5 9.5 4.3-1.4 7.5-4.8 7.5-9.5V6L12 3Z"/><path d="m8.8 12 2.2 2.2 4.4-4.6"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"/><path d="M14 3v5h5"/></symbol>
+    <symbol id="i-db" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5.5" rx="7" ry="2.5"/><path d="M5 5.5v13c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5v-13"/><path d="M5 12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5"/></symbol>
+    <symbol id="i-monitor-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8"/><path d="M12 16v4"/><path d="m10 8 4 4"/><path d="m14 8-4 4"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-tag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8Z"/><circle cx="7.5" cy="7.5" r="1.5"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></symbol>
+  </svg>
+
+  <!-- ===================== ENCABEZADO ===================== -->
+  <header class="site-header">
+    <div class="container">
+      <a href="#inicio" class="logo" aria-label="SalvaData, ir al inicio">
+        <svg class="logo-mark" aria-hidden="true"><use href="#logo"/></svg>
+        <span>SalvaData</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="menu">
+        <svg class="icon" aria-hidden="true"><use href="#i-menu"/></svg>
+      </button>
+      <nav class="nav" id="menu" aria-label="Secciones">
+        <div class="nav__links">
+          <a href="#problema">Problema</a>
+          <a href="#producto">Producto</a>
+          <a href="#como-funciona">Cómo funciona</a>
+          <a href="#precio">Precio</a>
+          <a href="#faq">Preguntas</a>
+        </div>
+        <a href="checkout.html?plan=prueba" class="btn btn--primary btn--sm">Prueba gratis</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ===================== 1. HERO ===================== -->
+    <section class="hero" id="inicio">
+      <div class="container">
+        <div>
+          <p class="pill">Respaldo en la nube para pequeños negocios</p>
+          <h1>Si tu computadora falla, tu negocio sigue.</h1>
+          <p class="hero__sub">SalvaData respalda automáticamente tu inventario, facturas y contabilidad en la nube, cifrados desde tu propio equipo. Si algo pasa, recuperas todo en minutos desde cualquier computadora.</p>
+          <div class="hero__actions">
+            <a href="checkout.html?plan=prueba" class="btn btn--primary btn--lg">
+              Prueba gratis 14 días
+              <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg>
+            </a>
+            <a href="#como-funciona" class="btn btn--outline btn--lg">Ver cómo funciona</a>
+          </div>
+          <ul class="inline-checks">
+            <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Sin tarjeta de crédito</li>
+            <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Cancela cuando quieras</li>
+            <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Hecho en San Miguel, El Salvador</li>
+          </ul>
+        </div>
+
+        <!-- Imagen representativa: el agente de escritorio terminando un respaldo -->
+        <div class="hero-visual" role="img" aria-label="Ventana del agente SalvaData mostrando un respaldo cifrado completado">
+          <div class="hero-visual__badge" aria-hidden="true">
+            <svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg>Cifrado AES-256 en tu equipo
+          </div>
+          <div class="agent-card" aria-hidden="true">
+            <div class="agent-card__top">
+              <div class="agent-card__brand">
+                <svg class="logo-mark"><use href="#logo"/></svg>Agente SalvaData
+              </div>
+              <span class="status">Protegido</span>
+            </div>
+            <div class="agent-card__main">
+              <div class="shield-circle"><svg><use href="#i-shield"/></svg></div>
+              <div>
+                <p class="agent-card__title">Respaldo completado</p>
+                <p class="agent-card__meta">Hoy, 6:00 p. m. · 1,284 archivos</p>
+              </div>
+            </div>
+            <div class="progress progress--full"><span></span></div>
+            <ul class="file-list">
+              <li><span><svg class="icon"><use href="#i-file"/></svg>Inventario_2026.xlsx</span><strong>Cifrado</strong></li>
+              <li><span><svg class="icon"><use href="#i-file"/></svg>Facturas_noviembre.pdf</span><strong>Cifrado</strong></li>
+              <li><span><svg class="icon"><use href="#i-db"/></svg>Clientes_y_fiados.db</span><strong>Cifrado</strong></li>
+            </ul>
+            <p class="agent-card__foot">Próximo respaldo automático: mañana, 6:00 p. m.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 2. PROBLEMA Y SOLUCIÓN ===================== -->
+    <section class="section section--white" id="problema">
+      <div class="container">
+        <p class="eyebrow eyebrow--warn">El problema</p>
+        <h2 class="section-title">¿Tu negocio depende de una sola computadora?</h2>
+        <p class="section-lead">En pulperías, ferreterías y pequeños comercios, el inventario, las facturas y la lista de clientes viven en un solo equipo. Basta un disco dañado, un robo o un virus para perder años de trabajo.</p>
+
+        <div class="grid-3 problem-grid">
+          <article class="pain-card">
+            <div class="pain-card__icon"><svg class="icon" aria-hidden="true"><use href="#i-monitor-x"/></svg></div>
+            <h3>“Se dañó la computadora”</h3>
+            <p>Y con ella se fue el inventario de todo el año y los saldos de los clientes que te deben.</p>
+          </article>
+          <article class="pain-card">
+            <div class="pain-card__icon"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg></div>
+            <h3>“Respaldo en USB… cuando me acuerdo”</h3>
+            <p>Copiar archivos a mano quita tiempo, se olvida y la memoria USB se pierde o se daña.</p>
+          </article>
+          <article class="pain-card">
+            <div class="pain-card__icon"><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg></div>
+            <h3>“Un virus bloqueó mis archivos”</h3>
+            <p>El ransomware secuestra tus datos y pide rescate. Sin una copia segura, no hay salida.</p>
+          </article>
+        </div>
+
+        <div class="solution">
+          <div>
+            <p class="eyebrow">La solución</p>
+            <h3>SalvaData respalda todo por ti, todos los días.</h3>
+            <p>Instalas el agente una sola vez y te olvidas. Tu información queda protegida en la nube, lejos de apagones, robos y virus.</p>
+          </div>
+          <ul class="check-list">
+            <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span><strong>Respaldo automático diario</strong> de las carpetas que tú elijas.</span></li>
+            <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span><strong>Cifrado en tu equipo</strong> antes de subir a la nube: nadie más puede leer tus datos.</span></li>
+            <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span><strong>Restauración con un clic</strong> desde cualquier computadora.</span></li>
+            <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span><strong>Alertas</strong> por correo o WhatsApp si un respaldo no se completa.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 3. MOCKUP DEL PRODUCTO ===================== -->
+    <section class="section section--dark" id="producto">
+      <div class="container">
+        <p class="eyebrow eyebrow--light">El producto</p>
+        <h2 class="section-title">Todo tu respaldo, en un panel sencillo</h2>
+        <p class="section-lead">Desde el navegador ves si tu negocio está protegido, qué se respaldó y restauras cualquier archivo. El agente de escritorio hace el trabajo pesado en segundo plano.</p>
+
+        <div class="browser">
+          <div class="browser__bar">
+            <div class="browser__dots" aria-hidden="true"><span></span><span></span><span></span></div>
+            <div class="browser__url">SalvaData · Dashboard web</div>
+          </div>
+          <div class="dash">
+            <aside class="dash__side">
+              <div class="logo">
+                <svg class="logo-mark" aria-hidden="true"><use href="#logo"/></svg><span>SalvaData</span>
+              </div>
+              <ul class="dash__menu">
+                <li class="is-active">Inicio</li>
+                <li>Respaldos</li>
+                <li>Restaurar</li>
+                <li>Equipos</li>
+                <li>Alertas</li>
+                <li>Facturación</li>
+              </ul>
+            </aside>
+            <div class="dash__main">
+              <div class="dash__head">
+                <div>
+                  <p class="dash__hello">Hola, Ferretería El Progreso</p>
+                  <p>Tu negocio está protegido. 2 equipos conectados.</p>
+                </div>
+                <button type="button" class="btn btn--primary btn--sm">Restaurar archivos</button>
+              </div>
+              <div class="stats">
+                <div class="stat">
+                  <p class="stat__label">Estado</p>
+                  <p class="stat__value stat__value--ok">Protegido</p>
+                </div>
+                <div class="stat">
+                  <p class="stat__label">Último respaldo</p>
+                  <p class="stat__value">Hoy, 6:00 p. m.</p>
+                </div>
+                <div class="stat">
+                  <p class="stat__label">Espacio usado</p>
+                  <p class="stat__value">12.4 GB <small>de 50 GB</small></p>
+                  <div class="progress"><span style="width: 25%"></span></div>
+                </div>
+              </div>
+              <p class="table-title">Respaldos recientes</p>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr><th scope="col">Fecha</th><th scope="col">Equipo</th><th scope="col">Archivos</th><th scope="col">Tamaño</th><th scope="col">Estado</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>18 nov, 6:00 p. m.</td><td>Caja principal</td><td>1,284</td><td>312 MB</td><td><span class="tag">Completado</span></td></tr>
+                    <tr><td>18 nov, 6:05 p. m.</td><td>Laptop oficina</td><td>842</td><td>1.2 GB</td><td><span class="tag">Completado</span></td></tr>
+                    <tr><td>17 nov, 6:00 p. m.</td><td>Caja principal</td><td>1,279</td><td>309 MB</td><td><span class="tag">Completado</span></td></tr>
+                    <tr><td>17 nov, 6:05 p. m.</td><td>Laptop oficina</td><td>838</td><td>1.2 GB</td><td><span class="tag tag--warn">Reintentado sin internet</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="mockup-caption">Prototipo de interfaz del dashboard web · datos de ejemplo</p>
+      </div>
+    </section>
+
+    <!-- ===================== 4. ¿CÓMO FUNCIONA? ===================== -->
+    <section class="section" id="como-funciona">
+      <div class="container">
+        <div class="section-head--center">
+          <p class="eyebrow">¿Cómo funciona?</p>
+          <h2 class="section-title">Protegido en 3 pasos</h2>
+          <p class="section-lead">No necesitas saber de tecnología. Lo configuras una vez y SalvaData trabaja solo.</p>
+        </div>
+        <ol class="grid-3 steps">
+          <li class="step">
+            <div class="step__num" aria-hidden="true">1</div>
+            <h3>Crea tu cuenta</h3>
+            <p>Regístrate con tu correo y empieza tu prueba de 14 días. No te pedimos tarjeta.</p>
+          </li>
+          <li class="step">
+            <div class="step__num" aria-hidden="true">2</div>
+            <h3>Instala el agente y elige qué proteger</h3>
+            <p>Descarga el agente para Windows y marca las carpetas: inventario, facturas, contabilidad o la base de datos de tu sistema de caja.</p>
+          </li>
+          <li class="step">
+            <div class="step__num" aria-hidden="true">3</div>
+            <h3>Listo: SalvaData trabaja solo</h3>
+            <p>Cada día se respalda y cifra todo automáticamente. Si algo falla, restauras desde el dashboard con un clic.</p>
+          </li>
+        </ol>
+        <div class="center-cta">
+          <a href="checkout.html?plan=prueba" class="btn btn--primary btn--lg">Empezar ahora, es gratis</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 5. DESGLOSE DE VALOR ===================== -->
+    <section class="section section--white" id="precio">
+      <div class="container pricing">
+        <div>
+          <p class="eyebrow">Precio</p>
+          <h2 class="section-title">Todo lo que necesitas para proteger tu negocio, en un solo plan</h2>
+          <p class="section-lead">Contratar cada servicio por separado costaría más del triple. Con SalvaData lo tienes todo junto, sin contratos ni costos de instalación.</p>
+          <p class="promo-note"><svg class="icon" aria-hidden="true"><use href="#i-tag"/></svg>Precio de lanzamiento para los primeros negocios</p>
+        </div>
+
+        <div class="price-card">
+          <div class="price-card__head">
+            <p class="price-card__name">Plan Negocio</p>
+            <span class="badge-gold">Ahorras $50 al mes</span>
+          </div>
+          <ul class="value-list">
+            <li><span>Agente de respaldo automático (Windows)</span><span>$15/mes</span></li>
+            <li><span>Almacenamiento cifrado en la nube (50 GB)</span><span>$20/mes</span></li>
+            <li><span>Dashboard web y restauración con un clic</span><span>$15/mes</span></li>
+            <li><span>Soporte técnico por WhatsApp</span><span>$10/mes</span></li>
+            <li><span>Alertas por correo y WhatsApp</span><span>$5/mes</span></li>
+            <li><span>Actualizaciones y mejoras continuas</span><span>$5/mes</span></li>
+          </ul>
+          <div class="value-total"><span>Valor total</span><s>$70/mes</s></div>
+          <div class="price-today">
+            <span class="price-today__label">Precio especial hoy</span>
+            <span class="price-today__amount">$20<small>/mes</small></span>
+          </div>
+          <a href="checkout.html?plan=mensual" class="btn btn--primary btn--lg btn--block">Suscribirme por $20/mes</a>
+          <p class="price-alt">o <a href="checkout.html?plan=prueba">prueba 14 días gratis</a>, sin tarjeta</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 6. PRUEBA SOCIAL ===================== -->
+    <section class="section" id="testimonios">
+      <div class="container">
+        <div class="section-head--center">
+          <p class="eyebrow">Antes y después</p>
+          <h2 class="section-title">Del respaldo a mano al respaldo automático</h2>
+        </div>
+
+        <div class="grid-2 compare">
+          <div class="compare__col compare__col--before">
+            <p class="compare__label">Antes: proceso manual</p>
+            <ul class="check-list">
+              <li><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg>Copias a una USB cuando te acuerdas</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg>Horas al mes buscando y copiando archivos</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg>Si la USB se pierde, tus datos quedan expuestos</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg>Recuperar información es rehacerla desde cero</li>
+            </ul>
+          </div>
+          <div class="compare__col compare__col--after">
+            <p class="compare__label">Después: con SalvaData</p>
+            <ul class="check-list">
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Respaldo automático todos los días</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Cero minutos de tu tiempo: se hace solo</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Datos cifrados: solo tú puedes leerlos</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Recuperas todo en minutos desde cualquier PC</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3 class="testimonials-title">Lo que buscan negocios como el tuyo</h3>
+        <p class="testimonials-note">Testimonios ilustrativos basados en nuestros Buyer Personas. Estamos en etapa de pilotos con comercios de San Miguel.</p>
+        <div class="grid-3 testimonials">
+          <figure class="testimonial">
+            <blockquote>“Llevo el inventario y los fiados en Excel. Saber que cada noche se guarda una copia solita me quita un peso de encima.”</blockquote>
+            <figcaption><span class="avatar avatar--1" aria-hidden="true">MR</span><span><strong>Marta R.</strong>Pulpería, San Miguel</span></figcaption>
+          </figure>
+          <figure class="testimonial">
+            <blockquote>“Un apagón me arruinó la computadora de la caja. Con SalvaData podría tener el sistema funcionando en otra laptop esa misma tarde.”</blockquote>
+            <figcaption><span class="avatar avatar--2" aria-hidden="true">CM</span><span><strong>Carlos M.</strong>Ferretería, Usulután</span></figcaption>
+          </figure>
+          <figure class="testimonial">
+            <blockquote>“No sé mucho de computación. Necesito algo que se instale fácil y que me diga en verde que todo está protegido.”</blockquote>
+            <figcaption><span class="avatar avatar--3" aria-hidden="true">AL</span><span><strong>Ana L.</strong>Librería y papelería, San Miguel</span></figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 7. PREGUNTAS FRECUENTES ===================== -->
+    <section class="section section--white" id="faq">
+      <div class="container faq">
+        <div class="section-head--center">
+          <p class="eyebrow">Preguntas frecuentes</p>
+          <h2 class="section-title">Resolvemos tus dudas</h2>
+        </div>
+        <div class="faq__list">
+          <details>
+            <summary>¿Necesito descargar algo?</summary>
+            <p>Solo un agente ligero para Windows, que se instala en minutos y trabaja en segundo plano. Todo lo demás —ver tus respaldos, restaurar archivos y administrar tu cuenta— lo haces desde el dashboard web, sin instalar nada más.</p>
+          </details>
+          <details>
+            <summary>¿Mis datos están seguros?</summary>
+            <p>Sí. Tus archivos se cifran con AES-256 en tu propia computadora antes de salir a internet y viajan por una conexión protegida con SSL/TLS. Se guardan en servidores de nube profesionales (AWS o DigitalOcean) y ni siquiera nuestro equipo puede leer su contenido.</p>
+          </details>
+          <details>
+            <summary>¿Qué pasa si mi computadora se daña o me la roban?</summary>
+            <p>Tus respaldos siguen intactos en la nube. Instalas el agente en otra computadora, inicias sesión y restauras tus archivos desde el dashboard con un clic.</p>
+          </details>
+          <details>
+            <summary>¿Necesito internet todo el tiempo?</summary>
+            <p>No. El agente respalda cuando hay conexión; si se va el internet, espera y retoma automáticamente cuando vuelve.</p>
+          </details>
+          <details>
+            <summary>¿Hará más lenta mi computadora?</summary>
+            <p>No deberías notarlo. Después del primer respaldo, el agente solo sube los cambios, y puedes programarlo en horas de poco movimiento, como al cerrar el negocio.</p>
+          </details>
+          <details>
+            <summary>¿Qué archivos puedo respaldar?</summary>
+            <p>Las carpetas que tú elijas: hojas de Excel, facturas en PDF, documentos de Word, fotos y la base de datos de tu sistema de caja o facturación. El plan incluye 50 GB de almacenamiento.</p>
+          </details>
+          <details>
+            <summary>¿Necesito conocimientos técnicos?</summary>
+            <p>No. La instalación es guiada paso a paso y, si te trabas, te ayudamos por WhatsApp.</p>
+          </details>
+          <details>
+            <summary>¿Qué pasa cuando termina la prueba gratis?</summary>
+            <p>Te avisamos antes de que termine. Si quieres seguir, eliges tu método de pago; si no, tu cuenta se pausa y no se te cobra nada.</p>
+          </details>
+          <details>
+            <summary>¿Cómo cancelo mi suscripción?</summary>
+            <p>Desde el dashboard, en Facturación › Cancelar plan. Sin llamadas ni penalizaciones, y puedes descargar todos tus respaldos antes de irte.</p>
+          </details>
+          <details>
+            <summary>¿Qué métodos de pago aceptan?</summary>
+            <p>Tarjetas de crédito y débito Visa, Mastercard, American Express y Diners Club, además de PayPal. Los pagos se procesan con una pasarela certificada y nunca guardamos los datos completos de tu tarjeta.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 8. GARANTÍA Y CTA FINAL ===================== -->
+    <section class="section section--dark" id="garantia">
+      <div class="container final-cta">
+        <div class="final-cta__icon"><svg aria-hidden="true"><use href="#i-shield"/></svg></div>
+        <h2 class="section-title">Pruébalo 14 días gratis. Sin tarjeta de crédito.</h2>
+        <p class="section-lead">Y si después de suscribirte no te convence, te devolvemos el dinero de tu primer mes dentro de los primeros 30 días. Sin preguntas.</p>
+        <div class="final-cta__actions">
+          <a href="checkout.html?plan=prueba" class="btn btn--primary btn--lg">Comenzar prueba gratis</a>
+          <a href="checkout.html?plan=mensual" class="btn btn--ghost-light btn--lg">Suscribirme por $20/mes</a>
+        </div>
+        <ul class="inline-checks">
+          <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Cancela cuando quieras</li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Garantía de devolución de 30 días</li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Tus datos siempre son tuyos</li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <a href="#inicio" class="logo"><svg class="logo-mark" aria-hidden="true"><use href="#logo"/></svg><span>SalvaData</span></a>
+      <p>© <span id="year">2026</span> SalvaData · San Miguel, El Salvador · Proyecto académico de Emprendimiento</p>
+      <nav aria-label="Legal">
+        <a href="#">Términos</a>
+        <a href="#">Privacidad</a>
+        <a href="#faq">Ayuda</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
