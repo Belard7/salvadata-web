@@ -44,11 +44,9 @@ th{color:var(--mut);font-weight:500}
 #toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s}
 #toast.on{opacity:1}
 .hide{display:none!important}
-.demo{background:var(--warn);color:var(--wt);font-size:13px;padding:8px 20px;text-align:center}
 </style>
 </head>
 <body>
-<div id="demo" class="demo hide">Modo demo: los datos se guardan solo en este navegador. Configura Firebase para guardarlos en la nube.</div
 <header>
   <a class="logo" href="index.html">Salva<b>Data</b></a>
   <button id="out" class="sec sm hide">Cerrar sesión</button>
@@ -101,15 +99,16 @@ th{color:var(--mut);font-weight:500}
 <div id="toast" role="status"></div>
 
 <script type="module">
-// LA CONFIGURACIÓN DE TU PROYECTO FIREBASE ======
+// ====== CONFIGURACIÓN DE TU PROYECTO FIREBASE ======
 const firebaseConfig = {
   apiKey: "AIzaSyAz_sWzusuP80JwZqkVsUEldz0GpiDMLso",
   authDomain: "salvadata-3ca84.firebaseapp.com",
   projectId: "salvadata-3ca84",
   appId: "1:1039803381678:web:ab0af8360c3c67fa3e7a3f"
 };
-// ===================================================================
-const DEMO = firebaseConfig.apiKey;
+// ===================================================
+
+let mode = "login", user = null, db = null, regBusy = false;
 const $ = id => document.getElementById(id);
 const EQ_DEF = ["Caja principal"];
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -117,7 +116,6 @@ function fillEq() {
   const l = user.equipos && user.equipos.length ? user.equipos : EQ_DEF;
   $("eq").innerHTML = l.map(e => `<option>${esc(e)}</option>`).join("");
 }
-let mode = "login", user = null, db = null, fb = {}, regBusy = false;
 
 const toast = t => { const e = $("toast"); e.textContent = t; e.classList.add("on"); setTimeout(() => e.classList.remove("on"), 2500); };
 const fmtF = ms => new Date(ms).toLocaleString("es-SV", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
@@ -129,37 +127,37 @@ const msg = c => ({
   "auth/invalid-email": "Escribe un correo válido."
 }[c] || "No se pudo completar. Intenta de nuevo.");
 
-// ====== Capa de datos: Firebase o localStorage (demo) ======
-const L = { get: (k, d) => JSON.parse(localStorage.getItem(k) || JSON.stringify(d)), set: (k, v) => localStorage.setItem(k, JSON.stringify(v)) };
-let api;
-if (DEMO) {
-  $("demo").classList.remove("hide");
-  api = {
-    async register(e, p, perfil) { const u = L.get("sd_users", {}); if (u[e]) throw { code: "auth/email-already-in-use" }; u[e] = { p, ...perfil, email: e, uid: e }; L.set("sd_users", u); L.set("sd_sess", e); return u[e]; },
-    async login(e, p) { const u = L.get("sd_users", {})[e]; if (!u || u.p !== p) throw { code: "auth/invalid-credential" }; L.set("sd_sess", e); return u; },
-    async logout() { localStorage.removeItem("sd_sess"); },
-    async setEquipos(uid, l) { const u = L.get("sd_users", {}); u[uid].equipos = l; L.set("sd_users", u); },
-    async session(cb) { const e = L.get("sd_sess", null); cb(e ? L.get("sd_users", {})[e] : null); },
-    async list(uid) { return L.get("sd_bk_" + uid, []); },
-    async add(uid, b) { const l = L.get("sd_bk_" + uid, []); b.id = "b" + Date.now(); l.push(b); L.set("sd_bk_" + uid, l); },
-    async restore(uid, id) { const l = L.get("sd_bk_" + uid, []); l.forEach(x => { if (x.id === id) x.restauradoEn = Date.now(); }); L.set("sd_bk_" + uid, l); }
-  };
-} else {
-  const V = "10.12.2", B = `https://www.gstatic.com/firebasejs/${V}/`;
-  const [{ initializeApp }, A, F] = await Promise.all([import(B + "firebase-app.js"), import(B + "firebase-auth.js"), import(B + "firebase-firestore.js")]);
-  const app = initializeApp(firebaseConfig), auth = A.getAuth(app); db = F.getFirestore(app);
-  api = {
-    async register(e, p, perfil) { const c = await A.createUserWithEmailAndPassword(auth, e, p); await F.setDoc(F.doc(db, "usuarios", c.user.uid), { ...perfil, email: e, creado: Date.now() }); return { uid: c.user.uid, email: e, ...perfil }; },
-    async login(e, p) { const c = await A.signInWithEmailAndPassword(auth, e, p); return this.perfil(c.user); },
-    async perfil(u) { const s = await F.getDoc(F.doc(db, "usuarios", u.uid)); return { uid: u.uid, email: u.email, ...(s.exists() ? s.data() : {}) }; },
-    async logout() { await A.signOut(auth); },
-    async setEquipos(uid, l) { await F.updateDoc(F.doc(db, "usuarios", uid), { equipos: l }); },
-    session(cb) { A.onAuthStateChanged(auth, async u => { if (regBusy) return; cb(u ? await this.perfil(u) : null); }); },
-    async list(uid) { const q = await F.getDocs(F.query(F.collection(db, "respaldos"), F.where("uid", "==", uid))); return q.docs.map(d => ({ id: d.id, ...d.data() })); },
-    async add(uid, b) { await F.addDoc(F.collection(db, "respaldos"), { ...b, uid }); },
-    async restore(uid, id) { await F.updateDoc(F.doc(db, "respaldos", id), { restauradoEn: Date.now() }); }
-  };
-}
+// ====== Capa de datos: Firebase ======
+const V = "10.12.2", B = `https://www.gstatic.com/firebasejs/${V}/`;
+const [{ initializeApp }, A, F] = await Promise.all([
+  import(B + "firebase-app.js"),
+  import(B + "firebase-auth.js"),
+  import(B + "firebase-firestore.js")
+]);
+const app = initializeApp(firebaseConfig), auth = A.getAuth(app);
+db = F.getFirestore(app);
+
+const api = {
+  async register(e, p, perfil) {
+    const c = await A.createUserWithEmailAndPassword(auth, e, p);
+    await F.setDoc(F.doc(db, "usuarios", c.user.uid), { ...perfil, email: e, creado: Date.now() });
+    return { uid: c.user.uid, email: e, ...perfil };
+  },
+  async login(e, p) { const c = await A.signInWithEmailAndPassword(auth, e, p); return this.perfil(c.user); },
+  async perfil(u) {
+    const s = await F.getDoc(F.doc(db, "usuarios", u.uid));
+    return { uid: u.uid, email: u.email, ...(s.exists() ? s.data() : {}) };
+  },
+  async logout() { await A.signOut(auth); },
+  async setEquipos(uid, l) { await F.updateDoc(F.doc(db, "usuarios", uid), { equipos: l }); },
+  session(cb) { A.onAuthStateChanged(auth, async u => { if (regBusy) return; cb(u ? await this.perfil(u) : null); }); },
+  async list(uid) {
+    const q = await F.getDocs(F.query(F.collection(db, "respaldos"), F.where("uid", "==", uid)));
+    return q.docs.map(d => ({ id: d.id, ...d.data() }));
+  },
+  async add(uid, b) { await F.addDoc(F.collection(db, "respaldos"), { ...b, uid }); },
+  async restore(uid, id) { await F.updateDoc(F.doc(db, "respaldos", id), { restauradoEn: Date.now() }); }
+};
 
 // ====== Interfaz ======
 function setMode(m) {
@@ -186,21 +184,20 @@ $("f").onsubmit = async ev => {
       setMode("login"); $("em").value = ""; $("pw").value = ""; $("nom").value = ""; $("neg").value = "";
       toast("Cuenta creada. Inicia sesión para entrar.");
     } else {
-      const u = await api.login(e, p);
-      if (DEMO) show(u);
+      await api.login(e, p);
       toast("Sesión iniciada.");
     }
-  } catch (x) { $("err").textContent = msg(x.code); }
+  } catch (x) { console.error(x); $("err").textContent = msg(x.code); }
   regBusy = false;
   $("go").disabled = false;
 };
-$("out").onclick = async () => { await api.logout(); if (DEMO) show(null); };
+$("out").onclick = async () => { await api.logout(); };
 
 async function render() {
   const l = (await api.list(user.uid)).sort((a, b) => b.fecha - a.fecha);
   const mb = l.reduce((s, x) => s + x.tamanoMB, 0);
   $("rows").innerHTML = l.slice(0, 10).map(x => `<tr><td>${fmtF(x.fecha)}</td><td>${esc(x.equipo)}</td><td>${x.archivos.toLocaleString("es-SV")}</td><td>${fmtT(x.tamanoMB)}</td>
-    <td><span class="pill ${x.estado === "Completado" ? "" : "w"}">${x.estado}</span></td>
+    <td><span class="pill ${x.estado === "Completado" ? "" : "w"}">${esc(x.estado)}</span></td>
     <td><button class="sec sm" data-id="${x.id}">${x.restauradoEn ? "Restaurado" : "Restaurar"}</button></td></tr>`).join("");
   $("empty").classList.toggle("hide", l.length > 0);
   $("st").textContent = l.length ? "Protegido" : "Sin respaldos";
@@ -215,12 +212,15 @@ $("rows").onclick = async ev => {
 $("run").onclick = async () => {
   $("run").disabled = true;
   const ok = Math.random() > .15;
-  await api.add(user.uid, {
-    fecha: Date.now(), equipo: $("eq").value,
-    archivos: 800 + Math.floor(Math.random() * 500), tamanoMB: 300 + Math.floor(Math.random() * 900),
-    estado: ok ? "Completado" : "Reintentado sin internet"
-  });
-  toast(ok ? "Respaldo completado." : "Sin internet: se reintentará."); $("run").disabled = false; render();
+  try {
+    await api.add(user.uid, {
+      fecha: Date.now(), equipo: $("eq").value,
+      archivos: 800 + Math.floor(Math.random() * 500), tamanoMB: 300 + Math.floor(Math.random() * 900),
+      estado: ok ? "Completado" : "Reintentado sin internet"
+    });
+    toast(ok ? "Respaldo completado." : "Sin internet: se reintentará.");
+  } catch (x) { console.error(x); toast("No se pudo guardar el respaldo."); }
+  $("run").disabled = false; render();
 };
 
 $("adq").onclick = async () => {
@@ -229,7 +229,7 @@ $("adq").onclick = async () => {
   const l = user.equipos && user.equipos.length ? [...user.equipos] : [...EQ_DEF];
   if (l.some(x => x.toLowerCase() === n.toLowerCase())) return toast("Ese equipo ya existe.");
   l.push(n);
-  try { await api.setEquipos(user.uid, l); } catch (e) { return toast("No se pudo guardar el equipo."); }
+  try { await api.setEquipos(user.uid, l); } catch (e) { console.error(e); return toast("No se pudo guardar el equipo."); }
   user.equipos = l; $("neq").value = ""; fillEq(); $("eq").value = n; toast("Equipo agregado.");
 };
 
