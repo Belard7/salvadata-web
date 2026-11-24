@@ -109,7 +109,7 @@ const firebaseConfig = {
   appId: "1:1039803381678:web:ab0af8360c3c67fa3e7a3f"
 };
 // ===================================================================
-const DEMO = firebaseConfig.apiKey === "PEGA_AQUI";
+const DEMO = firebaseConfig.apiKey;
 const $ = id => document.getElementById(id);
 const EQ_DEF = ["Caja principal"];
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -117,7 +117,7 @@ function fillEq() {
   const l = user.equipos && user.equipos.length ? user.equipos : EQ_DEF;
   $("eq").innerHTML = l.map(e => `<option>${esc(e)}</option>`).join("");
 }
-let mode = "login", user = null, db = null, fb = {};
+let mode = "login", user = null, db = null, fb = {}, regBusy = false;
 
 const toast = t => { const e = $("toast"); e.textContent = t; e.classList.add("on"); setTimeout(() => e.classList.remove("on"), 2500); };
 const fmtF = ms => new Date(ms).toLocaleString("es-SV", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
@@ -154,7 +154,7 @@ if (DEMO) {
     async perfil(u) { const s = await F.getDoc(F.doc(db, "usuarios", u.uid)); return { uid: u.uid, email: u.email, ...(s.exists() ? s.data() : {}) }; },
     async logout() { await A.signOut(auth); },
     async setEquipos(uid, l) { await F.updateDoc(F.doc(db, "usuarios", uid), { equipos: l }); },
-    session(cb) { A.onAuthStateChanged(auth, async u => cb(u ? await this.perfil(u) : null)); },
+    session(cb) { A.onAuthStateChanged(auth, async u => { if (regBusy) return; cb(u ? await this.perfil(u) : null); }); },
     async list(uid) { const q = await F.getDocs(F.query(F.collection(db, "respaldos"), F.where("uid", "==", uid))); return q.docs.map(d => ({ id: d.id, ...d.data() })); },
     async add(uid, b) { await F.addDoc(F.collection(db, "respaldos"), { ...b, uid }); },
     async restore(uid, id) { await F.updateDoc(F.doc(db, "respaldos", id), { restauradoEn: Date.now() }); }
@@ -179,10 +179,19 @@ $("f").onsubmit = async ev => {
   ev.preventDefault(); $("err").textContent = ""; $("go").disabled = true;
   const e = $("em").value.trim(), p = $("pw").value;
   try {
-    const u = mode === "register" ? await api.register(e, p, { nombre: $("nom").value.trim(), negocio: $("neg").value.trim() }) : await api.login(e, p);
-    if (DEMO) show(u);
-    toast(mode === "register" ? "Cuenta creada. Tu prueba de 14 días empezó." : "Sesión iniciada.");
+    if (mode === "register") {
+      regBusy = true;
+      await api.register(e, p, { nombre: $("nom").value.trim(), negocio: $("neg").value.trim() });
+      await api.logout();
+      setMode("login"); $("pw").value = ""; $("nom").value = ""; $("neg").value = "";
+      toast("Cuenta creada. Inicia sesión para entrar.");
+    } else {
+      const u = await api.login(e, p);
+      if (DEMO) show(u);
+      toast("Sesión iniciada.");
+    }
   } catch (x) { $("err").textContent = msg(x.code); }
+  regBusy = false;
   $("go").disabled = false;
 };
 $("out").onclick = async () => { await api.logout(); if (DEMO) show(null); };
