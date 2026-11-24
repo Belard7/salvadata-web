@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SalvaData · Mi panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--g:#0f7b4d;--gl:#e4efe9;--ink:#0f172a;--mut:#5b6472;--bg:#f4f4f3;--card:#fff;--line:#e5e7eb;--warn:#fdf3ec;--wt:#b4501a;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--ink:#e8edf3;--mut:#9aa6b5;--bg:#0f172a;--card:#16213a;--line:#26334f;--gl:#16352a;--warn:#3a2417;--wt:#f0a070;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+h1,h2,h3{font-family:'Space Grotesk',Inter,sans-serif;margin:0}
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:var(--card);border-bottom:1px solid var(--line)}
+.logo{font-family:'Space Grotesk';font-weight:700;font-size:20px;color:var(--ink);text-decoration:none}
+.logo b{color:var(--g)}
+main{max-width:920px;margin:0 auto;padding:24px 16px 56px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}
+.auth{max-width:400px;margin:32px auto}
+label{display:block;font-size:14px;font-weight:600;margin:14px 0 4px}
+input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--bg);color:var(--ink)}
+input:focus-visible,button:focus-visible{outline:3px solid var(--g);outline-offset:2px}
+button{font:inherit;font-weight:600;border:0;border-radius:8px;padding:11px 16px;cursor:pointer;background:var(--g);color:#fff}
+button.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}
+button.sm{padding:6px 10px;font-size:13px}
+.full{width:100%;margin-top:18px}
+.link{background:none;color:var(--g);padding:0;text-decoration:underline}
+.err{color:#c0392b;font-size:14px;min-height:20px;margin-top:10px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
+@media(max-width:700px){.grid{grid-template-columns:1fr}}
+.k{font-size:13px;color:var(--mut)}.v{font-size:22px;font-weight:700;font-family:'Space Grotesk'}
+.bar{height:6px;background:var(--line);border-radius:6px;margin-top:8px;overflow:hidden}.bar i{display:block;height:100%;background:var(--g)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line)}
+th{color:var(--mut);font-weight:500}
+.pill{padding:2px 10px;border-radius:99px;font-size:12px;font-weight:600;background:var(--gl);color:var(--g)}
+.pill.w{background:var(--warn);color:var(--wt)}
+.empty{text-align:center;color:var(--mut);padding:28px 0}
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.on{opacity:1}
+.hide{display:none!important}
+.demo{background:var(--warn);color:var(--wt);font-size:13px;padding:8px 20px;text-align:center}
+</style>
+</head>
+<body>
+<div id="demo" class="demo hide">Modo demo: los datos se guardan solo en este navegador. Configura Firebase para guardarlos en la nube.</div>
+<header>
+  <a class="logo" href="index.html">Salva<b>Data</b></a>
+  <button id="out" class="sec sm hide">Cerrar sesión</button>
+</header>
+<main>
+  <!-- Registro / Login -->
+  <section id="vAuth" class="card auth">
+    <h2 id="aT">Inicia sesión</h2>
+    <form id="f" autocomplete="on">
+      <div id="rg" class="hide">
+        <label for="nom">Tu nombre</label><input id="nom" autocomplete="name">
+        <label for="neg">Nombre de tu negocio</label><input id="neg" placeholder="Ej. Ferretería El Progreso">
+      </div>
+      <label for="em">Correo</label><input id="em" type="email" required autocomplete="email">
+      <label for="pw">Contraseña (mínimo 6 caracteres)</label><input id="pw" type="password" required minlength="6" autocomplete="current-password">
+      <div id="err" class="err" role="alert"></div>
+      <button id="go" class="full" type="submit">Entrar</button>
+    </form>
+    <p style="text-align:center;font-size:14px"><span id="sw">¿Aún no tienes cuenta?</span> <button id="tg" class="link" type="button">Crea tu cuenta gratis</button></p>
+  </section>
+
+  <!-- Dashboard -->
+  <section id="vDash" class="hide">
+    <div class="top">
+      <div><h1 id="hi">Hola</h1><div class="k" id="sub"></div></div>
+      <button id="run">Ejecutar respaldo ahora</button>
+    </div>
+    <div class="grid">
+      <div class="card"><div class="k">Estado</div><div class="v" id="st">Sin respaldos</div></div>
+      <div class="card"><div class="k">Último respaldo</div><div class="v" id="last">—</div></div>
+      <div class="card"><div class="k">Espacio usado</div><div class="v" id="sp">0 GB <span class="k">de 50 GB</span></div><div class="bar"><i id="pb" style="width:0"></i></div></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:10px">Respaldos recientes</h3>
+      <div class="tw"><table>
+        <thead><tr><th>Fecha</th><th>Equipo</th><th>Archivos</th><th>Tamaño</th><th>Estado</th><th></th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table></div>
+      <div id="empty" class="empty hide">Aún no hay respaldos. Pulsa «Ejecutar respaldo ahora» para crear el primero.</div>
+    </div>
+  </section>
+</main>
+<div id="toast" role="status"></div>
+
+<script type="module">
+// ====== 1) PEGA AQUÍ LA CONFIGURACIÓN DE TU PROYECTO FIREBASE ======
+const firebaseConfig = {
+  apiKey: "AIzaSyAz_sWzusuP80JwZqkVsUEldz0GpiDMLso",
+  authDomain: "salvadata-3ca84.firebaseapp.com",
+  projectId: "salvadata-3ca84",
+  appId: "1:1039803381678:web:ab0af8360c3c67fa3e7a3f"
+};
+// ===================================================================
+const DEMO = firebaseConfig.apiKey === "PEGA_AQUI";
+const $ = id => document.getElementById(id);
+const EQUIPOS = ["Caja principal", "Laptop oficina"];
+let mode = "login", user = null, db = null, fb = {};
+
+const toast = t => { const e = $("toast"); e.textContent = t; e.classList.add("on"); setTimeout(() => e.classList.remove("on"), 2500); };
+const fmtF = ms => new Date(ms).toLocaleString("es-SV", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
+const fmtT = mb => mb >= 1024 ? (mb / 1024).toFixed(1) + " GB" : mb + " MB";
+const msg = c => ({
+  "auth/email-already-in-use": "Ese correo ya tiene cuenta. Inicia sesión.",
+  "auth/invalid-credential": "Correo o contraseña incorrectos.",
+  "auth/weak-password": "La contraseña debe tener al menos 6 caracteres.",
+  "auth/invalid-email": "Escribe un correo válido."
+}[c] || "No se pudo completar. Intenta de nuevo.");
+
+// ====== Capa de datos: Firebase o localStorage (demo) ======
+const L = { get: (k, d) => JSON.parse(localStorage.getItem(k) || JSON.stringify(d)), set: (k, v) => localStorage.setItem(k, JSON.stringify(v)) };
+let api;
+if (DEMO) {
+  $("demo").classList.remove("hide");
+  api = {
+    async register(e, p, perfil) { const u = L.get("sd_users", {}); if (u[e]) throw { code: "auth/email-already-in-use" }; u[e] = { p, ...perfil, email: e, uid: e }; L.set("sd_users", u); L.set("sd_sess", e); return u[e]; },
+    async login(e, p) { const u = L.get("sd_users", {})[e]; if (!u || u.p !== p) throw { code: "auth/invalid-credential" }; L.set("sd_sess", e); return u; },
+    async logout() { localStorage.removeItem("sd_sess"); },
+    async session(cb) { const e = L.get("sd_sess", null); cb(e ? L.get("sd_users", {})[e] : null); },
+    async list(uid) { return L.get("sd_bk_" + uid, []); },
+    async add(uid, b) { const l = L.get("sd_bk_" + uid, []); b.id = "b" + Date.now(); l.push(b); L.set("sd_bk_" + uid, l); },
+    async restore(uid, id) { const l = L.get("sd_bk_" + uid, []); l.forEach(x => { if (x.id === id) x.restauradoEn = Date.now(); }); L.set("sd_bk_" + uid, l); }
+  };
+} else {
+  const V = "10.12.2", B = `https://www.gstatic.com/firebasejs/${V}/`;
+  const [{ initializeApp }, A, F] = await Promise.all([import(B + "firebase-app.js"), import(B + "firebase-auth.js"), import(B + "firebase-firestore.js")]);
+  const app = initializeApp(firebaseConfig), auth = A.getAuth(app); db = F.getFirestore(app);
+  api = {
+    async register(e, p, perfil) { const c = await A.createUserWithEmailAndPassword(auth, e, p); await F.setDoc(F.doc(db, "usuarios", c.user.uid), { ...perfil, email: e, creado: Date.now() }); return { uid: c.user.uid, email: e, ...perfil }; },
+    async login(e, p) { const c = await A.signInWithEmailAndPassword(auth, e, p); return this.perfil(c.user); },
+    async perfil(u) { const s = await F.getDoc(F.doc(db, "usuarios", u.uid)); return { uid: u.uid, email: u.email, ...(s.exists() ? s.data() : {}) }; },
+    async logout() { await A.signOut(auth); },
+    session(cb) { A.onAuthStateChanged(auth, async u => cb(u ? await this.perfil(u) : null)); },
+    async list(uid) { const q = await F.getDocs(F.query(F.collection(db, "respaldos"), F.where("uid", "==", uid))); return q.docs.map(d => ({ id: d.id, ...d.data() })); },
+    async add(uid, b) { await F.addDoc(F.collection(db, "respaldos"), { ...b, uid }); },
+    async restore(uid, id) { await F.updateDoc(F.doc(db, "respaldos", id), { restauradoEn: Date.now() }); }
+  };
+}
+
+// ====== Interfaz ======
+function setMode(m) {
+  mode = m; const reg = m === "register";
+  $("aT").textContent = reg ? "Crea tu cuenta" : "Inicia sesión";
+  $("go").textContent = reg ? "Crear cuenta" : "Entrar";
+  $("rg").classList.toggle("hide", !reg);
+  $("nom").required = $("neg").required = reg;
+  $("sw").textContent = reg ? "¿Ya tienes cuenta?" : "¿Aún no tienes cuenta?";
+  $("tg").textContent = reg ? "Inicia sesión" : "Crea tu cuenta gratis";
+  $("pw").autocomplete = reg ? "new-password" : "current-password";
+  $("err").textContent = "";
+}
+$("tg").onclick = () => setMode(mode === "login" ? "register" : "login");
+
+$("f").onsubmit = async ev => {
+  ev.preventDefault(); $("err").textContent = ""; $("go").disabled = true;
+  const e = $("em").value.trim(), p = $("pw").value;
+  try {
+    const u = mode === "register" ? await api.register(e, p, { nombre: $("nom").value.trim(), negocio: $("neg").value.trim() }) : await api.login(e, p);
+    if (DEMO) show(u);
+    toast(mode === "register" ? "Cuenta creada. Tu prueba de 14 días empezó." : "Sesión iniciada.");
+  } catch (x) { $("err").textContent = msg(x.code); }
+  $("go").disabled = false;
+};
+$("out").onclick = async () => { await api.logout(); if (DEMO) show(null); };
+
+async function render() {
+  const l = (await api.list(user.uid)).sort((a, b) => b.fecha - a.fecha);
+  const mb = l.reduce((s, x) => s + x.tamanoMB, 0);
+  $("rows").innerHTML = l.slice(0, 10).map(x => `<tr><td>${fmtF(x.fecha)}</td><td>${x.equipo}</td><td>${x.archivos.toLocaleString("es-SV")}</td><td>${fmtT(x.tamanoMB)}</td>
+    <td><span class="pill ${x.estado === "Completado" ? "" : "w"}">${x.estado}</span></td>
+    <td><button class="sec sm" data-id="${x.id}">${x.restauradoEn ? "Restaurado" : "Restaurar"}</button></td></tr>`).join("");
+  $("empty").classList.toggle("hide", l.length > 0);
+  $("st").textContent = l.length ? "Protegido" : "Sin respaldos";
+  $("last").textContent = l.length ? fmtF(l[0].fecha) : "—";
+  $("sp").innerHTML = `${(mb / 1024).toFixed(1)} GB <span class="k">de 50 GB</span>`;
+  $("pb").style.width = Math.min(100, mb / 512) + "%";
+}
+$("rows").onclick = async ev => {
+  const id = ev.target.dataset.id; if (!id) return;
+  await api.restore(user.uid, id); toast("Restauración registrada."); render();
+};
+$("run").onclick = async () => {
+  $("run").disabled = true;
+  const ok = Math.random() > .15;
+  await api.add(user.uid, {
+    fecha: Date.now(), equipo: EQUIPOS[Math.floor(Math.random() * 2)],
+    archivos: 800 + Math.floor(Math.random() * 500), tamanoMB: 300 + Math.floor(Math.random() * 900),
+    estado: ok ? "Completado" : "Reintentado sin internet"
+  });
+  toast(ok ? "Respaldo completado." : "Sin internet: se reintentará."); $("run").disabled = false; render();
+};
+
+function show(u) {
+  user = u; const on = !!u;
+  $("vAuth").classList.toggle("hide", on); $("vDash").classList.toggle("hide", !on); $("out").classList.toggle("hide", !on);
+  if (on) { $("hi").textContent = "Hola, " + (u.negocio || u.nombre || u.email); $("sub").textContent = u.email; render(); }
+  else { $("f").reset(); setMode("login"); }
+}
+api.session(show);
+</script>
+</body>
+</html>
