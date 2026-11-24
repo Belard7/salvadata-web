@@ -31,6 +31,9 @@ button.sm{padding:6px 10px;font-size:13px}
 .k{font-size:13px;color:var(--mut)}.v{font-size:22px;font-weight:700;font-family:'Space Grotesk'}
 .bar{height:6px;background:var(--line);border-radius:6px;margin-top:8px;overflow:hidden}.bar i{display:block;height:100%;background:var(--g)}
 .top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.runbox{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap}
+select{padding:11px 12px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--bg);color:var(--ink);min-width:190px}
+select:focus-visible{outline:3px solid var(--g);outline-offset:2px}
 .tw{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}
 th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line)}
@@ -71,7 +74,14 @@ th{color:var(--mut);font-weight:500}
   <section id="vDash" class="hide">
     <div class="top">
       <div><h1 id="hi">Hola</h1><div class="k" id="sub"></div></div>
-      <button id="run">Ejecutar respaldo ahora</button>
+      <div class="runbox">
+        <div><label for="eq" style="margin:0 0 4px">Equipo a respaldar</label><select id="eq"></select></div>
+        <button id="run">Ejecutar respaldo ahora</button>
+      </div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <label for="neq" style="margin-top:0">Agrega un equipo de tu negocio</label>
+      <div class="runbox"><input id="neq" placeholder="Ej. PC de la bodega" maxlength="40" style="max-width:300px"><button id="adq" class="sec" type="button">Agregar equipo</button></div>
     </div>
     <div class="grid">
       <div class="card"><div class="k">Estado</div><div class="v" id="st">Sin respaldos</div></div>
@@ -91,7 +101,7 @@ th{color:var(--mut);font-weight:500}
 <div id="toast" role="status"></div>
 
 <script type="module">
-// ====== 1) PEGA AQUÍ LA CONFIGURACIÓN DE TU PROYECTO FIREBASE ======
+// LA CONFIGURACIÓN DE TU PROYECTO FIREBASE ======
 const firebaseConfig = {
   apiKey: "AIzaSyAz_sWzusuP80JwZqkVsUEldz0GpiDMLso",
   authDomain: "salvadata-3ca84.firebaseapp.com",
@@ -101,7 +111,12 @@ const firebaseConfig = {
 // ===================================================================
 const DEMO = firebaseConfig.apiKey === "PEGA_AQUI";
 const $ = id => document.getElementById(id);
-const EQUIPOS = ["Caja principal", "Laptop oficina"];
+const EQ_DEF = ["Caja principal"];
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+function fillEq() {
+  const l = user.equipos && user.equipos.length ? user.equipos : EQ_DEF;
+  $("eq").innerHTML = l.map(e => `<option>${esc(e)}</option>`).join("");
+}
 let mode = "login", user = null, db = null, fb = {};
 
 const toast = t => { const e = $("toast"); e.textContent = t; e.classList.add("on"); setTimeout(() => e.classList.remove("on"), 2500); };
@@ -123,6 +138,7 @@ if (DEMO) {
     async register(e, p, perfil) { const u = L.get("sd_users", {}); if (u[e]) throw { code: "auth/email-already-in-use" }; u[e] = { p, ...perfil, email: e, uid: e }; L.set("sd_users", u); L.set("sd_sess", e); return u[e]; },
     async login(e, p) { const u = L.get("sd_users", {})[e]; if (!u || u.p !== p) throw { code: "auth/invalid-credential" }; L.set("sd_sess", e); return u; },
     async logout() { localStorage.removeItem("sd_sess"); },
+    async setEquipos(uid, l) { const u = L.get("sd_users", {}); u[uid].equipos = l; L.set("sd_users", u); },
     async session(cb) { const e = L.get("sd_sess", null); cb(e ? L.get("sd_users", {})[e] : null); },
     async list(uid) { return L.get("sd_bk_" + uid, []); },
     async add(uid, b) { const l = L.get("sd_bk_" + uid, []); b.id = "b" + Date.now(); l.push(b); L.set("sd_bk_" + uid, l); },
@@ -137,6 +153,7 @@ if (DEMO) {
     async login(e, p) { const c = await A.signInWithEmailAndPassword(auth, e, p); return this.perfil(c.user); },
     async perfil(u) { const s = await F.getDoc(F.doc(db, "usuarios", u.uid)); return { uid: u.uid, email: u.email, ...(s.exists() ? s.data() : {}) }; },
     async logout() { await A.signOut(auth); },
+    async setEquipos(uid, l) { await F.updateDoc(F.doc(db, "usuarios", uid), { equipos: l }); },
     session(cb) { A.onAuthStateChanged(auth, async u => cb(u ? await this.perfil(u) : null)); },
     async list(uid) { const q = await F.getDocs(F.query(F.collection(db, "respaldos"), F.where("uid", "==", uid))); return q.docs.map(d => ({ id: d.id, ...d.data() })); },
     async add(uid, b) { await F.addDoc(F.collection(db, "respaldos"), { ...b, uid }); },
@@ -173,7 +190,7 @@ $("out").onclick = async () => { await api.logout(); if (DEMO) show(null); };
 async function render() {
   const l = (await api.list(user.uid)).sort((a, b) => b.fecha - a.fecha);
   const mb = l.reduce((s, x) => s + x.tamanoMB, 0);
-  $("rows").innerHTML = l.slice(0, 10).map(x => `<tr><td>${fmtF(x.fecha)}</td><td>${x.equipo}</td><td>${x.archivos.toLocaleString("es-SV")}</td><td>${fmtT(x.tamanoMB)}</td>
+  $("rows").innerHTML = l.slice(0, 10).map(x => `<tr><td>${fmtF(x.fecha)}</td><td>${esc(x.equipo)}</td><td>${x.archivos.toLocaleString("es-SV")}</td><td>${fmtT(x.tamanoMB)}</td>
     <td><span class="pill ${x.estado === "Completado" ? "" : "w"}">${x.estado}</span></td>
     <td><button class="sec sm" data-id="${x.id}">${x.restauradoEn ? "Restaurado" : "Restaurar"}</button></td></tr>`).join("");
   $("empty").classList.toggle("hide", l.length > 0);
@@ -190,17 +207,27 @@ $("run").onclick = async () => {
   $("run").disabled = true;
   const ok = Math.random() > .15;
   await api.add(user.uid, {
-    fecha: Date.now(), equipo: EQUIPOS[Math.floor(Math.random() * 2)],
+    fecha: Date.now(), equipo: $("eq").value,
     archivos: 800 + Math.floor(Math.random() * 500), tamanoMB: 300 + Math.floor(Math.random() * 900),
     estado: ok ? "Completado" : "Reintentado sin internet"
   });
   toast(ok ? "Respaldo completado." : "Sin internet: se reintentará."); $("run").disabled = false; render();
 };
 
+$("adq").onclick = async () => {
+  const n = $("neq").value.trim().slice(0, 40);
+  if (!n) return toast("Escribe el nombre del equipo.");
+  const l = user.equipos && user.equipos.length ? [...user.equipos] : [...EQ_DEF];
+  if (l.some(x => x.toLowerCase() === n.toLowerCase())) return toast("Ese equipo ya existe.");
+  l.push(n);
+  try { await api.setEquipos(user.uid, l); } catch (e) { return toast("No se pudo guardar el equipo."); }
+  user.equipos = l; $("neq").value = ""; fillEq(); $("eq").value = n; toast("Equipo agregado.");
+};
+
 function show(u) {
   user = u; const on = !!u;
   $("vAuth").classList.toggle("hide", on); $("vDash").classList.toggle("hide", !on); $("out").classList.toggle("hide", !on);
-  if (on) { $("hi").textContent = "Hola, " + (u.negocio || u.nombre || u.email); $("sub").textContent = u.email; render(); }
+  if (on) { $("hi").textContent = "Hola, " + (u.negocio || u.nombre || u.email); $("sub").textContent = u.email; fillEq(); render(); }
   else { $("f").reset(); setMode("login"); }
 }
 api.session(show);
