@@ -48,7 +48,6 @@ th{color:var(--mut);font-weight:500}
 </style>
 </head>
 <body>
-<div id="demo" class="demo hide">Modo demo: los datos se guardan solo en este navegador. Configura Firebase para guardarlos en la nube.</div>
 <header>
   <a class="logo" href="index.html">Salva<b>Data</b></a>
   <button id="out" class="sec sm hide">Cerrar sesión</button>
@@ -59,10 +58,10 @@ th{color:var(--mut);font-weight:500}
     <h2 id="aT">Inicia sesión</h2>
     <form id="f" autocomplete="on">
       <div id="rg" class="hide">
-        <label for="nom">Tu nombre</label><input id="nom" autocomplete="name">
+        <label for="nom">Tu nombre</label><input id="nom" autocomplete="off">
         <label for="neg">Nombre de tu negocio</label><input id="neg" placeholder="Ej. Ferretería El Progreso">
       </div>
-      <label for="em">Correo</label><input id="em" type="email" required autocomplete="email">
+      <label for="em">Correo</label><input id="em" type="email" required autocomplete="off">
       <label for="pw">Contraseña (mínimo 6 caracteres)</label><input id="pw" type="password" required minlength="6" autocomplete="current-password">
       <div id="err" class="err" role="alert"></div>
       <button id="go" class="full" type="submit">Entrar</button>
@@ -183,7 +182,7 @@ $("f").onsubmit = async ev => {
       regBusy = true;
       await api.register(e, p, { nombre: $("nom").value.trim(), negocio: $("neg").value.trim() });
       await api.logout();
-      setMode("login"); $("pw").value = ""; $("nom").value = ""; $("neg").value = "";
+      setMode("login"); $("em").value = ""; $("pw").value = ""; $("nom").value = ""; $("neg").value = "";
       toast("Cuenta creada. Inicia sesión para entrar.");
     } else {
       const u = await api.login(e, p);
